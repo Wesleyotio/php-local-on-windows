@@ -11,6 +11,7 @@ Uma coisa que já é sabida há um bom tempo é que NÃO precisamos usar o Xampp
   - [Usando o SQLite](#usando-o-sqlite)
 
 
+# Instalando O PHP no Windows
 Para instalar o PHP no windows basta somente 3 passos, primeiro que vamos baixar os arquivos zipados no linK: [PHP para windows](https://windows.php.net/download/), importante mencionar que talvez seja necessário instalar o **Visual C++ Redistributable for Visual Studio**, verifique antes no seu windows ele está instalado, caso contrário basta baixar neste link: [Visual C++ Redistributable](https://aka.ms/vs/16/release/VC_redist.x64.exe), instalação padrão do windows, faz *next* até aparecer o *finish*. 
 
 O próprio site explica as diferenças entre as versões disponíveis, para este exemplo vou usar o **PHP 8.2 (8.2.19)** com a versão **VS16 x64 Thread Safe (2024-May-08 07:21:58)**, para a gente vamos somente baixar o arquivo .ZIP como mostrado na figura.
@@ -36,7 +37,67 @@ Edite a variável **Path** e nela coloque o caminho da pasta do php: **"C:\php"*
 
 Com isso você já pode fazer fazer seus programas com o PHP, mas aqui a gente quer colocar um ambiente de desenvolvimento arretado, então vamos configurar o gerenciador de pendencias do PHP o [commposer](https://getcomposer.org) e nossa ferramenta de debug o [Xdebug](https://xdebug.org).
 
+Para instalar o composer basta fazer o [baixar o executável](https://getcomposer.org/download/) e mais uma vez basta fazer ***next*** e depois ***finish***. Se tudo estiver ocorrido como o desejado validamos rodando o comando. 
 
+```
+composer -v
+``` 
 
+E o resultado deve ser esse.
 
+![image](composer-5.png)
 
+Com isso temos nosso PHP e composer devidamente instalado, agora vamos para nossa ferramenta de depuração.
+
+# Instalando o Xdebug
+Caso não conheça o essa ferramenta incrível, minha sugestão é fazer uma lida rápida na [Documentação do Xdebug](https://xdebug.org/docs/all_settings), aqui vou fazer a instalação e uma configuração básica que tenho usado no em meu ambiente local.
+
+Primeiro vamos baixar a dll do Xdebug para windows, acessando o [link](https://xdebug.org/download#releases), agora tenha atenção para que a versão selecionada seja compatível com a versão de PHP usada no Windows.
+
+![image](xdebug-6.png)
+
+Selecionada a versão correta, descompacte e mude o nome para **php_xdebug.dll**, em seguida adicione a extensão em *C:\php\ext*. Feito isso temos a extensão pronta, mas ainda precisamos habilitar para uso, fazemos isso editando o arquivo *php.ini*.
+
+Pesquise dentro do *php,ini* por ***zend_extension=*** , provavelmente você irá encontrar algo desse tipo.
+```
+;zend_extension=opcache
+```
+Duplique a linha e modifique para que fique agora assim.
+```
+;zend_extension=opcache
+zend_extension=xdebug
+``` 
+Basicamente o que estamos fazendo é **habilitar/ativar** o uso da extensão para nosso PHP local, mas só isso não é suficiente, precisamos acionar algumas coisas para deixar o Xdebug zero bala para o desenvolvimento. Ainda no arquivo *php.ini* role até o final do arquivo e acrescente o seguinte bloco.    
+
+```
+[Xdebug]
+xdebug.mode=debug,develop //controla quais recursos do Xdebug estão habilitados
+xdebug.client_host=localhost //Configura o host ao qual o Xdebug conecta ao iniciar uma conexão de depuração.
+xdebug.start_with_request=trigger // depuração de etapas 
+xdebug.idekey=VSCODE //chave IDE que o Xdebug deve passar para o cliente ou proxy
+xdebug.client_port=9003  // A porta à qual o Xdebug tenta se conectar no host remoto
+xdebug.var_display_max_children=128 //Controla a quantidade de filhos do array e as propriedades do objeto são mostradas quando as variáveis ​​são exibidas com var_dump()
+xdebug.filename_format=...%s%a // determina o formato com o qual o Xdebug renderiza nomes de arquivos em rastreamentos de pilha HTML
+```
+Essas são as configurações que julgo serem suficientes para quem tá começando, mas caso queira entrar mais a fundo leia a documentação das [configurações do Xdebug](https://xdebug.org/docs/all_settings).
+
+Para saber de maneira bem simples se o Xdebug foi ativado corretamente é via comando, basta abrir o terminal e fazer.
+
+```
+php -i
+```
+O resultado será gigante, mas o mais importante é procurar pelo Xdebug, que deve aparecer assim.
+
+![image](xdebug-7.png)
+
+Para finalizar essa parte, precisamos só de mais um detalhe, uma extensão para nosso navegador seja ele o [Firefox](https://addons.mozilla.org/pt-BR/firefox/addon/xdebug-helper-for-firefox/) ou [Chrome](https://chromewebstore.google.com/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc), na extensão clique que opções e a tela apresentada será esta.
+
+![image](xdebug-8.png)
+
+Pronto em **IDE key** deixe os parâmetros como na imagem **Other** e ***VSCODE***, acredito que deva ter notado que esse é o mesmo valor que colocamos em nosso ***xdebug.idekey***, agora lembre de deixar a extensão sempre ativada quando estiver depurando seu código PHP.
+
+# VScode e suas extensões
+
+Para ser mais direto e não deixar o tutorial mais longo que o necessário, vai nas extensões do VSCODE e digita simplesmente php, para inicio instala somente  ***PHP Intelephense***, ***PHP Debug*** e ***PHP IntelliSense***.
+
+![image](vscode-9.png)
