@@ -98,6 +98,84 @@ Pronto em **IDE key** deixe os parâmetros como na imagem **Other** e ***VSCODE*
 
 # VScode e suas extensões
 
-Para ser mais direto e não deixar o tutorial mais longo que o necessário, vai nas extensões do VSCODE e digita simplesmente php, para inicio instala somente  ***PHP Intelephense***, ***PHP Debug*** e ***PHP IntelliSense***.
+Para ser mais direto e não deixar o tutorial mais longo que o necessário, vai nas extensões do VSCODE e digita php, para inicio instala somente  ***[PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)***, ***[PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug)*** e ***[PHP IntelliSense](https://marketplace.visualstudio.com/items?itemName=zobo.php-intellisense)***.
 
 ![image](vscode-9.png)
+
+Com tudo devidamente instalado vamos no menu lateral e clicamos no ícone de depuração ou simplesmente o comando (**Ctrl + Shift + D**) provavelmente você verá algo como demonstrado na imagem a seguir.
+
+![image](vscode-10.png)
+
+Basta agora clicar em ***create a launch.json file*** e escolha a opção PHP que o próprio VScode vai se virar para criar uma configuração para ti, aqui ele gerou isso aqui pra mim.
+
+```JSON
+   "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003
+        },
+        {
+            "name": "Launch currently open script",
+            "type": "php",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${fileDirname}",
+            "port": 0,
+            "runtimeArgs": [
+                "-dxdebug.start_with_request=yes"
+            ],
+            "env": {
+                "XDEBUG_MODE": "debug,develop",
+                "XDEBUG_CONFIG": "client_port=${port}"
+            }
+        },
+        {
+            "name": "Launch Built-in web server",
+            "type": "php",
+            "request": "launch",
+            "runtimeArgs": [
+                "-dxdebug.mode=debug",
+                "-dxdebug.start_with_request=yes",
+                "-S",
+                "localhost:0"
+            ],
+            "program": "",
+            "cwd": "${workspaceRoot}",
+            "port": 9003,
+            "serverReadyAction": {
+                "pattern": "Development Server \\(http://localhost:([0-9]+)\\) started",
+                "uriFormat": "http://localhost:%s",
+                "action": "openExternally"
+            }
+        }
+    ]
+}
+```
+
+Para nossas necessidades atuais, basta selecionar a opção *Listen for Xdebug* para iniciar o processo de depuração, vamos fazer assim,  crie um diretório na raiz do sistema e em seguida um arquivo *index.php*, como mostrado na imagem.
+
+![image](vscode-11.png)
+
+O diretório vendor e os arquivos composer.json e composer.lock aparecem quando instalamos dependências em nosso projeto, mas para seu exemplo não ligue para eles.
+
+Em seu terminal navegue até o diretório que onde o arquivo *index.php* está localizado e basta rodar o seguinte comando para inicializar o servidor do PHP.
+
+```sh
+php -S localhost:8080
+```
+O resultado será esse aqui.
+
+![image](servidor-12.png)
+
+No navegador acesse por [http://localhost:8080](http://localhost:8080) e o resultado esperado deve ser.
+
+![image](servidor-13.png)
+
+Nosso sistema está rodando perfeitamente bem e sem nara relacionado a XAMPP, viu nem foi tão difícil assim, agora para fechar de fato essa parte, vamos testar no Xdebug. Aqui eu coloquei um *breackpoint* na linha 2 em seguida inicializamos o debug do VCcode e damos um F5 na pagina http://localhost:8080
+
+![image](Xdebug-14.png)
+
+Se para ti apareceu uma imagem semelhante a que temos acima, podemos ter certeza que nosso ambiente com servidor local de PHP e ferramenta de depuração estão prontos para desenvolvimento.  
