@@ -178,4 +178,24 @@ Nosso sistema está rodando perfeitamente bem e sem nara relacionado a XAMPP, vi
 
 ![image](Xdebug-14.png)
 
-Se para ti apareceu uma imagem semelhante a que temos acima, podemos ter certeza que nosso ambiente com servidor local de PHP e ferramenta de depuração estão prontos para desenvolvimento.  
+Se para ti apareceu uma imagem semelhante a que temos acima, podemos ter certeza que nosso ambiente com servidor local de PHP e ferramenta de depuração estão prontos para desenvolvimento.
+
+# Usando o SQLite
+Para incio de conversa precisamos fazer a instalação do **sqllite**, acessando o [link](https://www.sqlite.org/download.html), selecione a  terceira opção.
+
+![image](SQLite-15.png)
+
+Semelhante a instalação do PHP, criamos um diretório na raiz do sistema de nome **sqlite** em seguida descompacte os arquivos nesta pasta e agora basta editar o PATH e apresentar a rota do diretório **C:\sqlite**. Para validar se está tudo funcionando bem basta rodar o comando. 
+
+```sh
+sqlite3
+```
+
+![image](SQLite-16.png)
+
+Precisamos agora fazer um ajuste em nosso **php.ini** para suportar o sqlite, então edite o arquivo para que fique com as extensões habilitadas como demonstrado a seguir.
+
+```
+extension=pdo_sqlite
+extension=sqlite3
+```
