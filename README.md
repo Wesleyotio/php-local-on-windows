@@ -1,4 +1,4 @@
-# PHP sem nada Xampp e com muito Xdebug no Windows
+# PHP sem nada de Xampp e com muito Xdebug no Windows
 
 Uma coisa que já é sabida há um bom tempo é que NÃO precisamos usar o Xampp para montarmos um bom ambiente de desenvolvimento, mas voce pode argumentar que o próprio site oficial do PHP na [Instalação no Windows](https://www.php.net/manual/pt_BR/install.windows.php) recomenda fazer uso dele por ser mais pratico, concordo totalmente com essa afirmativa, mas o problema é que além de PHP são instalados outra ruma de tranqueiras que são desnecessárias. Caso queira entender o motivo dessas ferramentas serem desnecessárias minha sugestão é assistir o video do Vinícius Dias de nome: [XAMPP: Por Que Este Não Deve Ser seu Ambiente de Desenvolvimento](https://www.youtube.com/watch?v=XgJbv1itIOE). Chega de conversa fiada e vamos para a configuração.
 
@@ -199,3 +199,129 @@ Precisamos agora fazer um ajuste em nosso **php.ini** para suportar o sqlite, en
 extension=pdo_sqlite
 extension=sqlite3
 ```
+Agora vamos criar um "projeto" usando para demonstrar o funcionamento do PHP com um banco de dados, fizemos uso do SQLite pelo simples fato de que ele cria somente um arquivo onde fica toda a estrutura necessária para nossas chamadas SQL.
+
+
+ ![image](SQLite-17.png)
+
+ Nosso **index.php** vai ficar assim.
+
+```PHP
+require __DIR__ . '/../vendor/autoload.php';
+
+use Database\Config;
+use Database\SQLiteConnection;
+
+try {
+    $connection = new SQLiteConnection(Config::PATH_TO_SQLITE_FILE);
+    $pdo = $connection->openConnect();
+    echo "Conectado com sucesso ao banco de dados SQLite.";
+} catch (\PDOException $e) {
+    echo "Erro de conexão: " . $e->getMessage();
+} catch (\Exception $e) {
+    echo "Erro: " . $e->getMessage();
+}
+```
+
+O arquivo **config.php** será responsável por registrar a localização do arquivo do banco.
+
+```PHP
+namespace Database;
+
+class Config {
+    
+    
+    const PATH_TO_SQLITE_FILE =  __DIR__ . '\db\phpsqlite.db';
+}
+```
+
+E por ultimo o **SQLiteConnection.php** fica responsável por estabelecer a conexão de fato com o SQlite.
+
+```PHP
+namespace Database;
+
+use PDOException;
+
+class SQLiteConnection {
+
+    private $pdo;
+
+    private $pathToSQLiteFile;
+
+    public function __construct($pathToSQLiteFile) {
+        if (!file_exists($pathToSQLiteFile)) {
+            throw new \Exception("Arquivo de banco de dados não encontrado: " . $pathToSQLiteFile);
+        }
+        $this->pdo = new \PDO("sqlite:" . $pathToSQLiteFile);
+        $this->pathToSQLiteFile = $pathToSQLiteFile;
+    }
+
+    public function openConnect() {
+        try{
+            if($this->pdo==null){
+              $this->pdo = new \PDO("sqlite:" . $this->pathToSQLiteFile,"","",array(
+                    \PDO::ATTR_PERSISTENT => true
+                ));
+            }
+            return $this->pdo;
+        }catch(PDOException $e){
+           
+            print "Error in open DB:  ".$e->getMessage();
+        }
+    }
+    public function getPDO() {
+        return $this->pdo;
+    }
+}
+```
+Antes de testar, vamos criar o arquivo para nosso banco de dados, tá mais para um tamborete de dados, navegue até o diretório de seu projeto e execute o comando comando.
+
+```sh
+sqlite3 database/db/phpsqlite.db
+```
+Agora no shell do SQLite vamos criar uma tabela de exemplo e assim é criado nosso arquivo de banco de dados.
+```SQL
+CREATE TABLE example (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+```
+em seguida rode o comando. 
+```sh
+.exit
+```
+
+Antes de fazer o nosso teste de conexão com o banco precisamos fazer o mapeamento de nossos aquivos via composer, para isso basta criar o arquivo composer.json na raiz do projeto ele deve ficar assim
+
+```JSON
+{
+    "autoload": {
+        "psr-4": {
+            "App\\": "public/",
+            "Database\\": "database/"
+        }
+    }
+}
+```
+```sh
+composer  dump-autoload  
+```
+Se tudo estiver ocorrido como o esperado, teremos a saída
+```sh
+Generating autoload files
+Generated autoload files  
+```
+depois disso essa será a organização de seu diretório.
+
+ ![image](SQLite-18.png)
+
+agora finalmente chegamos ao fim, navegue até o diretório **"C:\project-php\public"** e execute o comando.
+
+```sh
+php -S localhost:8080
+```
+em seu navegador o resultado deve ser este:
+
+ ![image](SQLite-19.png)
+
+Agora, você tem um ambiente de desenvolvimento devidamente configurado, para uma leitura complementar ficar o link do [PHP do jeito certo](http://br.phptherightway.com) 
